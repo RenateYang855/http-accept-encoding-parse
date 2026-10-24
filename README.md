@@ -26,3 +26,10 @@ The trade-off: the parser is deliberately non-validating. It does not reject unk
 - **`x-compress` is normalised to `compress`**; `x-gzip` is not, because in modern practice `x-gzip` and `gzip` are distinct tokens and collapsing them would hide client intent.
 - **`q`-values are clamped to `[0, 1]` and rounded to three decimals**. A `q=1.5` becomes `1`; `q=abc` defaults to `1` (the parameter is treated as unrecognised and ignored per RFC 9110).
 - **Order is preserved from the header**; the output is not re-sorted by `q`. Sort it yourself if you need that.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
